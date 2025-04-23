@@ -1,0 +1,17 @@
+- 映像(Image)是唯讀的
+    - 當變更server.js的內容，並且再次執行指令 `docker run ...` 指令後，不會在重新連入時看到變更的結果
+    - 當host執行 `docker build ...` 、創建映像的過程中，Dockerfile中的 `COPY ...` 指令被執行到時，Docker會創建複製當下的原始碼檔快照(sanpshot)，所以當變更原始碼內容，並不會更新快照
+    - 此時就必須重新執行 `docker build ...` 指令，將該原始碼檔快照進行更新
+    - 未來會學到更優雅的方式，以避免在每次修改程式碼後都必須rebuild映像，才能夠更新容器啟動時的實際內容
+        - Bind Mounts
+        - Docker-compose configurations for files hot loading
+        - Optimize docker rebuild process through Multi-stage building
+    - Images are basically locked and finished ever since you build them
+
+- Image另一個重要概念: Layer based
+    - 當執行 `docker build ...` 指令時，Dockerfile中的逐行指令只有"有實質變更"的相關指令會被再次執行
+    - 例如：當原始碼有變更時， `COPY . /node_app` 會被再次執行 (包含但不限於)
+    - Image本身是多個唯讀層(layer)架構起來的結構
+    - 基本上每一行指令都可視為一層(layer)，少部分僅為容器行為，例如： `CMD ...`、`ENTERPOINT ...`
+    - 創建Container時，Docker 基於映像的所有唯讀層，在其最上層添加一個可寫層(Writable layer)，形成完整的分層文件系統結構。此結構結合運行時環境（如網絡、進程空間等），即被視為容器實例的誕生。
+    - 當 Dockerfile 中的某一行指令（Layer）因為有變更而在構建階段被執行時，從該指令開始，以下所有指令都會因緩存無法重用而被重新執行。這是因為每一層都依賴於前一層的結果，當前一層發生變化時，後續層的緩存將失效，需重新構建。
