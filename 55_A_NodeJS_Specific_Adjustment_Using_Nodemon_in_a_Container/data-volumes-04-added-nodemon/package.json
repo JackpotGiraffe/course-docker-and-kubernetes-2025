@@ -1,0 +1,19 @@
+{
+  "name": "data-volume-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "author": "Maximilian Schwarzmüller / Academind GmbH",
+  "license": "ISC",
+  "scripts": {
+    "comment": "這邊原本的指令是 'start': 'nodemon server.js'，因為當前開發環境是在 Windows 上，必須透過WSL2來執行Docker，而 Windows 的檔案系統與 WSL2 的檔案系統不同步的關係所以微調指令加上參數 -L 才會產生效果",
+    "start": "nodemon -L server.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "2.0.4"
+  }
+}
