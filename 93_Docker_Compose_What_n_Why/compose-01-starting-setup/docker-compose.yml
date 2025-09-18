@@ -1,0 +1,96 @@
+# 本檔案版號，這個版號通常可以用來指定 Docker Compose 文件的語法版本
+# 令閱讀者或使用者對於可使用在這個docker-compose.yml檔案的語法能有參考
+version: "3.8"
+
+# 定義服務，直白地說就是定義要啟動哪些容器
+services:
+  mongodb: # db
+    # 當不使用docker-compose時，連線字串必須要用conatiner name來取代localhost
+    # 例如：mongodb://mongoyaya:27017
+    # 但是在docker-compose協助建置的環境下，反而因為DNS的關係，必需使用service name來取代localhost
+    # 例如：mongodb://mongodb:27017
+    image: "mongo" # 使用的 Docker 映像檔名稱或標籤
+    # --rm 參數帶來的效果在docker-compose中是預設行為，毋須特別宣告
+    
+    # 當使用到命名卷的情況，會額外在跟services同層級宣告
+    volumes: # 各種情境下可能會需要多個volumes
+      - data:/data/db
+
+    # 下面是其中一種設置環境變數的方式
+    # environment:
+    #   - MONGO_INITDB_ROOT_USERNAME=udemy_course_user
+    #   - MONGO_INITDB_ROOT_PASSWORD=udemy_course_pwd
+    #   或    
+    #   MONGO_INITDB_ROOT_USERNAME: udemy_course_user
+    #   MONGO_INITDB_ROOT_PASSWORD: udemy_course_pwd
+
+    # 另一種方式是指向外部.env files
+    #   1. 創建/編輯 env/mongo.env
+    #   2. 在這裡使用 env_file 屬性來指定該檔案
+    env_file:
+      - ./env/mongo.env
+
+    # 不須額外宣告網路
+    # networks:
+    #   - goals-net
+  
+  backend: # goals-backend
+    # build: ./backend # 簡易版本，複雜版本如下
+    build:
+      context: ./backend # 指定Dockerfile所在目錄，且引用該目錄下的Dockerfile時會根據檔案位置執行其中的指令，避免路徑問題
+      dockerfile: Dockerfile # 指定Dockerfile檔案名稱，預設為Dockerfile，可以省略
+    image: indianapacer15/udemy-docker-n-kubernetes-course:course-93-backend # 建立完成後的映像檔名稱與標籤
+
+    ports: # 對外映射的埠號，根據應用程式設計及其他考量進行調整
+      - "80:80"
+
+    volumes: # 開發環境常用，將本機目錄掛載到容器內，方便開發時即時看到變更
+      - logs:/app/logs # 將命名卷logs掛載到容器內的/app/logs目錄 (named volume) ，且記得在最外層的命名卷區塊加上宣告
+      - ./backend:/app # 將本機backend目錄掛載到容器內的/app目錄 (bind mount)
+      - /app/node_modules # 避免本機node_modules覆蓋掉容器內的node_modules (anonymous volume)
+
+    env_file: # 指向外部.env files
+      - ./env/backend.env
+
+    depends_on: # 有些情況下需要等待其他服務啟動完成，可以在這邊定義依賴關係，用service name進行宣告
+      # 注意不要做出循環依賴
+      - mongodb
+
+    # 不須額外宣告網路
+    # networks:
+    #   - goals-net
+    
+  frontend: # goals-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: indianapacer15/udemy-docker-n-kubernetes-course:course-93-frontend
+
+    ports:
+      - "3000:3000"
+
+    volumes: # 開發環境常用，將本機目錄掛載到容器內，方便開發時即時看到變更
+      - ./frontend/src:/app/src # 將本機frontend/src目錄掛載到容器內的/app/src目錄 (bind mount)
+
+    # 為了配合React的前端設計，必需要在啟動容器時同時啟用互動模式 (-it參數效果)
+    stdin_open: true # 保持容器的標準輸入流打開，這樣可以讓容器在前台運行，方便查看日誌和互動
+    tty: true # 分配一個虛擬終端，這樣可以讓容器模擬一個終端環境，方便進行互動操作
+
+    depends_on:
+      - backend
+
+    # 不須額外宣告網路
+    # networks:
+    #   - goals-net
+
+# 使用docker-compose整合多個容器時，如果沒有特別需求，可以不額外宣告創建docker network
+# 預設行為，在同一個docker-compose file中的多個容器，會由docker自動創建臨時的網路並將所有容器加入其中
+
+# 實際上當有需要使用到命名卷的情況下，還是建議明確宣告
+# 宣告方式必須與services同層級
+# 這個區塊不會宣告匿名卷以及綁定掛載(bind mount)
+volumes:
+  # 這邊不需要特別指定映射路徑，因為映射路徑是由服務內的容器自行決定
+  # 當services內不同的容器引用到同一個命名卷時，會自動將該命名卷掛載到各自容器的指定路徑
+  data:
+  logs:
