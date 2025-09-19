@@ -4,3 +4,4 @@ node_modules
 # Files to ignore
 *.DS_Store
 *.txt
+*.env
