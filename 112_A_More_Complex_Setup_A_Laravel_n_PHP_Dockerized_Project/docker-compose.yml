@@ -1,0 +1,77 @@
+# version: "3.8"
+services:
+  server:
+    container_name: "nginx_server"
+    image: indianapacer15/udemy-docker-n-kubernetes-course:courser-112-app-nginx
+    build:
+      context: .
+      dockerfile: dockerfiles/nginx.dockerfile
+    ports:
+      - "8000:80"
+    # 下面的 bind mount 是為了開發環境設置的，如果將來要部署到正式環境，通常會把 source code 以及 nginx.conf 直接 copy 進 image 裡面
+    # 詳細動作已經做在 server.dockerfile 中，屆時這部分的標籤就可以註解掉，當然如此一來在正式環境就無法直接將本機對 source code 的修改即時反映在 container 裡面
+    volumes:
+      - ./src:/var/www/html
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro # 由 docker hub 的 nginx 官方頁面建議的 bind mount 路徑
+    depends_on:
+      - php
+      - mysql
+
+  php: # service 名稱需要跟 nginx.conf 的 fastcgi_pass 一致
+    container_name: "php_fpm" # php_fpm 的全名是 PHP FastCGI Process Manager，用來管理 PHP 程式執行的伺服器端程式
+    image: indianapacer15/udemy-docker-n-kubernetes-course:courser-112-app-php
+    build: # 這邊會先建立客製化的映像檔
+      context: .
+      dockerfile: dockerfiles/php.dockerfile
+    # 後端架構會有source code，所以這邊會把專案目錄 bind mount 進去
+    # 下面的 bind mount 是為了開發環境設置的，如果將來要部署到正式環境，通常會把 source code 直接 copy 進 image 裡面
+    # 詳細動作已經做在 php.dockerfile 中，屆時這部分的標籤就可以註解掉，當然如此一來在正式環境就無法直接將本機對 source code 的修改即時反映在 container 裡面
+    volumes:
+      - ./src:/var/www/html:delegated # delegated 是 macOS 專用的選項，讓 host 端的檔案系統優先於 container 端
+    # 為了避免 php interpreter container 跟 web server container 之間溝通還仍經過 localhost 的網路層
+    # 這邊會把兩個 container 放在同一個自訂網路，此時不需要在這邊特別 expose port
+    # 而是將 nginx.conf 的 fastcgi_pass 指向 php container 的 service name，並使用官方建議的 port 9000(預設) 即可
+
+  mysql:
+    container_name: "mysql_db"
+    image: indianapacer15/udemy-docker-n-kubernetes-course:courser-112-app-mysql
+    build:
+      context: .
+      dockerfile: dockerfiles/mysql.dockerfile
+    env_file: # 必要的 mysql 環境變數，可直接參考 docker hub 的 mysql 官方頁面
+      - ./env/mysql.env
+
+
+  # 下面三個是本專案需要及非必要的 utility service(container)，可視需求決定要不要加入
+
+  # 使用 composer 來管理 PHP 的相依套件，可以參考 laravel 官方文件的 installation 章節，他同樣可以用來建置 laravel 專案的初始環境
+  composer: # 用官方 image 製作客製化 image
+    container_name: "composer_util"
+    image: indianapacer15/udemy-docker-n-kubernetes-course:courser-112-util-composer
+    build:
+      context: .
+      dockerfile: dockerfiles/composer.dockerfile
+    volumes:
+      - ./src:/var/www/html:delegated # composer 的工作目錄與後端相同是 /var/www/html
+
+  # 這個 utililty service 需要指令 "artisan migrate" 來執行資料庫 migrations(初始化資料庫)
+  # docker-compose run --rm artisan migrate
+  artisan:
+    container_name: "artisan_util"
+    image: indianapacer15/udemy-docker-n-kubernetes-course:courser-112-util-artisan
+    build:
+      context: .
+      dockerfile: dockerfiles/php.dockerfile
+    volumes:
+      - ./src:/var/www/html:delegated
+    # 原始的 php.dockerfile 是用來跑 php-fpm 的，這邊需要 override 掉 entrypoint (原本沒有，所以這邊單純加上額外設定)
+    entrypoint: ["php", "/var/www/html/artisan"] # artisan 是 laravel 的 CLI 工具
+
+  npm:
+    container_name: "npm_util"
+    image: indianapacer15/udemy-docker-n-kubernetes-course:courser-112-util-npm
+    build:
+      context: .
+      dockerfile: dockerfiles/npm.dockerfile
+    volumes:
+      - ./src:/var/www/html:delegated
