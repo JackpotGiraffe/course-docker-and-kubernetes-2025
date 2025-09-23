@@ -2,7 +2,7 @@
 services:
   server:
     container_name: "nginx_server"
-    image: indianapacer15/udemy-docker-n-kubernetes-course:courser-112-app-nginx
+    image: indianapacer15/udemy-docker-n-kubernetes-course:course-112-app-nginx
     build:
       context: .
       dockerfile: dockerfiles/nginx.dockerfile
@@ -19,7 +19,7 @@ services:
 
   php: # service 名稱需要跟 nginx.conf 的 fastcgi_pass 一致
     container_name: "php_fpm" # php_fpm 的全名是 PHP FastCGI Process Manager，用來管理 PHP 程式執行的伺服器端程式
-    image: indianapacer15/udemy-docker-n-kubernetes-course:courser-112-app-php
+    image: indianapacer15/udemy-docker-n-kubernetes-course:course-112-app-php
     build: # 這邊會先建立客製化的映像檔
       context: .
       dockerfile: dockerfiles/php.dockerfile
@@ -34,7 +34,7 @@ services:
 
   mysql:
     container_name: "mysql_db"
-    image: indianapacer15/udemy-docker-n-kubernetes-course:courser-112-app-mysql
+    image: indianapacer15/udemy-docker-n-kubernetes-course:course-112-app-mysql
     build:
       context: .
       dockerfile: dockerfiles/mysql.dockerfile
@@ -47,7 +47,7 @@ services:
   # 使用 composer 來管理 PHP 的相依套件，可以參考 laravel 官方文件的 installation 章節，他同樣可以用來建置 laravel 專案的初始環境
   composer: # 用官方 image 製作客製化 image
     container_name: "composer_util"
-    image: indianapacer15/udemy-docker-n-kubernetes-course:courser-112-util-composer
+    image: indianapacer15/udemy-docker-n-kubernetes-course:course-112-util-composer
     build:
       context: .
       dockerfile: dockerfiles/composer.dockerfile
@@ -58,7 +58,7 @@ services:
   # docker-compose run --rm artisan migrate
   artisan:
     container_name: "artisan_util"
-    image: indianapacer15/udemy-docker-n-kubernetes-course:courser-112-util-artisan
+    image: indianapacer15/udemy-docker-n-kubernetes-course:course-112-util-artisan
     build:
       context: .
       dockerfile: dockerfiles/php.dockerfile
@@ -69,7 +69,7 @@ services:
 
   npm:
     container_name: "npm_util"
-    image: indianapacer15/udemy-docker-n-kubernetes-course:courser-112-util-npm
+    image: indianapacer15/udemy-docker-n-kubernetes-course:course-112-util-npm
     build:
       context: .
       dockerfile: dockerfiles/npm.dockerfile
