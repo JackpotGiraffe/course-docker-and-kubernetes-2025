@@ -9,7 +9,7 @@
     - `docker-compose -p php-laravel-demo run --rm artisan view:cache`
     - `docker-compose -p php-laravel-demo run --rm artisan key:generate`
 
-5. (optional) `docker-compose -p php-larvel-demo run --rm npm`
+5. (optional) `docker-compose -p php-larvel-demo run --rm npm install`
 
 6. (others)
     - `docker-compose -p php-laravel-demo down -v`
