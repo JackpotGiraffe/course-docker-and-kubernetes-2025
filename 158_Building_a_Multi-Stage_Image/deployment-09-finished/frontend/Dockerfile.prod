@@ -1,0 +1,35 @@
+# Stage 1: Build the React application
+FROM node:24-alpine as stage1
+
+WORKDIR /app
+
+COPY package.json .
+
+RUN npm install
+
+COPY . .
+
+# Build stage 不再需要 EXPOSE 3000，因為這個階段只是用來 build React application
+# EXPOSE 3000
+
+# ------------------------------ Stage 分隔線 ------------------------------
+
+# 為了設計Multi-Stage Build，這邊不使用CMD指令，取而代之以RUN指令來執行build
+# CMD [ "npm", "run", "build" ]
+RUN npm run build
+
+# Stage 2: Serve the React application with Nginx
+# 一個Dockerfile僅能基於一個基底映像檔，因此這邊需要使用Multi-Stage Build的方式來達成
+# 使用Nginx做為基底映像檔時會覆蓋掉前一個基底映像檔，因為on一個react application不需要使用到node.js
+FROM nginx:stable-alpine
+
+# 為了能在這個stage使用到build過的optiomized React application
+# 會使用到特殊的語法，來從前一個stage複製檔案過來
+# 1. 在開頭的FROM指令末加上 "as <stage-name>"，來命名這個stage
+# 2. 在後續的stage中，使用 "COPY --from=<stage-name> <source-path> <destination-path>" 來複製檔案
+# 這邊的路徑都有官方文件引導，請參考
+COPY --from=stage1 /app/build /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
