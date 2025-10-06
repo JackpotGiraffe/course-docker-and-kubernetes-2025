@@ -9,7 +9,7 @@ metadata:
 
 # Spec 用來宣告部署的細節，例如 replicas, selector, template，使用的 Image 等
 spec: # 這是 deployment(本檔) 的 spec
-  replicas: 1
+  replicas: 2
   
   selector: # 這是一個必要標籤，用來指定這個 Deployment 要管理哪些 Pod
     matchLabels: # 這裡的 key/value 必須和 template.metadata.labels 一致
