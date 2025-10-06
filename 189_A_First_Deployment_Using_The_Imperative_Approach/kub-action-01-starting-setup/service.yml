@@ -15,7 +15,7 @@ spec:
     # 這樣也不影響目前 service 的 selector 選擇 Pod
 
   ports: # ports (複數型) 定義多個埠號
-    - protocol: TCP # 定義協定，這裡是 TCP
+    - protocol: "TCP" # 定義協定，這裡是 TCP
       port: 80     # service 對外的埠號
       targetPort: 8080 # 轉發到 Pod 的埠號
 

@@ -1,0 +1,35 @@
+# 整合 service.yml 和 deployment.yml 成一個檔案時，規定的語法必須將多個 resource 用 --- 分隔
+# 這個檔案的順序是先宣告 service，再宣告 deployment
+# 因為 service 會先於 deployment 建立，並且在擁有對應 labes 的 pods 建立後動態地交由 service 管理
+apiVersion: v1
+kind: Service
+metadata:
+  name: d-mode-app-service
+spec:
+  selector:
+    app: d-mode-app
+  ports:
+    - protocol: "TCP"
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: d-mode-app
+spec:
+  replicas: 2  
+  selector:
+    matchLabels:
+      app: d-mode-app
+      tier: backend  
+  template:
+    metadata:
+      labels:
+        app: d-mode-app
+        tier: backend    
+    spec:
+      containers:
+        - name: d-mode-app
+          image: indianapacer15/udemy-docker-n-kubernetes-course:course-189-k8s-imperative-1.02
