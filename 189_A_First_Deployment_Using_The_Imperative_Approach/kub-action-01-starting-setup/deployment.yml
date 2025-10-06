@@ -1,0 +1,30 @@
+# K8s Declarative Approach
+apiVersion: apps/v1
+
+# 必要標籤 kind
+kind: Deployment
+
+metadata:
+  name: d-mode-app
+
+# Spec 用來宣告部署的細節，例如 replicas, selector, template，使用的 Image 等
+spec: # 這是 deployment(本檔) 的 spec
+  replicas: 1
+  
+  selector: # 這是一個必要標籤，用來指定這個 Deployment 要管理哪些 Pod
+    matchLabels: # 這裡的 key/value 必須和 template.metadata.labels 一致
+    # 凡是任何一個 Pod 的 template.metadata.labels 與這邊的 matchLabels 沒有完全一致，這個 Deployment 就不會管理該 Pod
+      app: d-mode-app
+      tier: backend
+  
+  template: # 規定 Pods 的樣板、使用的 Image、Label 等
+    metadata:
+      labels: # 自訂的標籤，包含 key/value 都是自訂命名
+        app: d-mode-app
+        tier: backend
+    
+    spec: # 這是 Pod 的 spec
+      containers:
+        # 只要使用多個 -name key 就可以宣告多個 Container
+        - name: d-mode-app
+          image: indianapacer15/udemy-docker-n-kubernetes-course:course-189-k8s-imperative-1.02

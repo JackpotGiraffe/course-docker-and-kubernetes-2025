@@ -1,0 +1,23 @@
+# K8s 的 service 宣告定義檔不一定要跟 deployment 宣告定義檔整合在一起，可以獨立設置
+apiVersion: v1 # service 的 api version 是 v1
+
+kind: Service # 必要標籤，這裡是 service
+
+metadata:
+  name: d-mode-app-service # service 的名稱
+
+spec:
+  selector: # 用來選擇這個 service 要對應到哪些 Pod
+    app: d-mode-app
+    # 這裡的 key/value 必須和 deployment.yml 裡面 template.metadata.labels 至少一項一致
+    # Service 的 selector 是包含式的 (inclusive)，也就是說 Pod 只要有包含這個 key/value 就會被選中
+    # 例如 deployment.yml 裡面 template.metadata.labels 有多一個 tier: backend 這個 key/value
+    # 這樣也不影響目前 service 的 selector 選擇 Pod
+
+  ports: # ports (複數型) 定義多個埠號
+    - protocol: TCP # 定義協定，這裡是 TCP
+      port: 80     # service 對外的埠號
+      targetPort: 8080 # 轉發到 Pod 的埠號
+
+  # service 的類型，使用指令的時候可以用 --type=LoadBalancer 參數實現，預設一樣是 ClusterIP
+  type: LoadBalancer
