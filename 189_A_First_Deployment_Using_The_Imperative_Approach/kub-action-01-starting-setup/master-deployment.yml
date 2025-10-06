@@ -23,7 +23,13 @@ spec:
   selector:
     matchLabels:
       app: d-mode-app
-      tier: backend  
+      tier: backend
+    # 原本使用的 matchLabels 事實上可以用 matchExpressions 來取代，這邊就類似邏輯運算，將多項複雜條件組合起來
+    # 這邊要注意 selector 是 k8s 的其中一種 immutable field (不可變更欄位)，一旦建立後就無法更改
+    # 如果要更改 selector 的話，必須刪除現有的 deployment，再重新建立
+    # matchExpressions:
+    #   - { key: app, operator: In, values: [d-mode-app] } # operator 可用 In, NotIn, Exists, DoesNotExist, Gt, Lt
+    #   - { key: tier, operator: In, values: [backend] }
   template:
     metadata:
       labels:
