@@ -39,3 +39,13 @@ spec:
       containers:
         - name: d-mode-app
           image: indianapacer15/udemy-docker-n-kubernetes-course:course-189-k8s-imperative-1.02
+          # 下方的宣告標籤，如字面意思，戳戳看是不是活著
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            periodSeconds: 5
+            initialDelaySeconds: 10
+        # multiple containers in one pod
+        # - name: ...
+        #   image: ...
