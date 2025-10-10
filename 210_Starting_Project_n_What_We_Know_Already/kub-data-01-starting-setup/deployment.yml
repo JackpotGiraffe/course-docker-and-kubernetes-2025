@@ -36,5 +36,5 @@ spec:
       volumes:
         - name: story-volume
           hostPath:
-            path: /data # 這是 hostPath 的設定，代表在每個 node 上的 /data 目錄 (類似 bind mount)
+            path: /data # 這是 hostPath 的設定，代表在每個 node 上的 /data 目錄 (類似 docker bind mount)
             type: DirectoryOrCreate # 如果目錄不存在，則自動建立
