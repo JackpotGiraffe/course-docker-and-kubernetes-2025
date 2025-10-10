@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: story-deployment
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: story
@@ -20,10 +20,21 @@ spec:
             # container 內的路徑，這邊參考了 dockerfile 中的 WORKDIR 以及 app.js 中讀取檔案的路徑
             - mountPath: /app/story
               name: story-volume # 對應下面 volumes 的 name
+
+      # ----- emptyDir 範例 -----
       # 需要的 volumes 需要加在這邊，與 container 同層級
-      volumes:
-        - name: story-volume
-          emptyDir: {} # 空的設定內容代表使用預設值，不做任何客製化
+      # volumes:
+      #   - name: story-volume
+      #     emptyDir: {} # 空的設定內容代表使用預設值，不做任何客製化
 
           # emptyDir 會在 Pod 啟動時建立一個空目錄，並在 Pod 被刪除時自動刪除該目錄
           # 如果 restart 或 remove 的僅是 container 而非 Pod，則該目錄會保留
+
+      # ----- hostPath 範例 -----
+      # 說明: 因為 emptyDir 是 created Pods by Pods，資料無法共用，當一個 Pods 處於修復或重啟狀態時
+      # 另一個 Pods 無法存取到相同的資料，可能造成資料遺失或不同步現象
+      volumes:
+        - name: story-volume
+          hostPath:
+            path: /data # 這是 hostPath 的設定，代表在每個 node 上的 /data 目錄 (類似 bind mount)
+            type: DirectoryOrCreate # 如果目錄不存在，則自動建立
