@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: story-deployment
+spec: 
+  replicas: 2
+  selector:
+    matchLabels:
+      app: story
+  template:
+    metadata:
+      labels:
+        app: story
+    spec:
+      containers:
+        - name: story
+          image: indianapacer15/udemy-docker-n-kubernetes-course:course-212-k8s-env-var-demo-v1.0
+          env: # 這邊用 ConfigMap 來設定環境變數
+            - name: STORY_FOLDER # key
+              value: 'story' # 基本的方法可以僅使用 value 直接指定
+              # valueFrom:
+              #   configMapKeyRef:
+              #     name: data-store-env
+              #     key: folder
+          volumeMounts:
+            - mountPath: /app/story
+              name: story-volume
+      volumes:
+        - name: story-volume
+          persistentVolumeClaim:
+            claimName: host-pvc
