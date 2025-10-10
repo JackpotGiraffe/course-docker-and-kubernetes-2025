@@ -1,0 +1,13 @@
+# ----- hostPath as Persistent Volume Claim(PVC) 範例 -----
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: host-pvc
+spec:
+  volumeName: host-pv # 指定要綁定的 PV 名稱 (非必要，但可以避免被其他 PVC 搶走，參考 host-pv.yml)
+  accessModes:
+    - ReadWriteOnce # 需要與綁定的 PV 的 accessModes 相符
+  storageClassName: standard # 需要與綁定的 PV 的 storageClassName 相符，預設值是 standard
+  resources:
+    requests:
+      storage: 1Gi # 需要與綁定的 PV 的 storage 大小相符或更小

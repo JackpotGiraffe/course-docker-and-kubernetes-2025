@@ -1,0 +1,19 @@
+# ----- hostPath as Persistent Volume(PV) 範例 -----
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: host-pv
+spec:
+  capacity:
+    storage: 1Gi
+  # volumeMode 預設是 Filesystem
+  volumeMode: Filesystem
+  storageClassName: standard # 需要與綁定的 PVC 的 storageClassName 相符，預設值是 standard
+  accessModes:
+    # 以下只能三選一
+    - ReadWriteOnce # 預設值，只能被單一 node 以讀寫模式掛載
+    # - ReadOnlyMany # 只能被多個 node 以唯讀模式掛載
+    # - ReadWriteMany # 可以被多個 node 以讀寫模式掛載
+  hostPath:
+    path: /data
+    type: DirectoryOrCreate # 如果目錄不存在，則自動建立

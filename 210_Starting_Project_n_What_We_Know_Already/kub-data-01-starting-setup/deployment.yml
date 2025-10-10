@@ -33,8 +33,14 @@ spec:
       # ----- hostPath 範例 -----
       # 說明: 因為 emptyDir 是 created Pods by Pods，資料無法共用，當一個 Pods 處於修復或重啟狀態時
       # 另一個 Pods 無法存取到相同的資料，可能造成資料遺失或不同步現象
+      # volumes:
+      #   - name: story-volume
+      #     hostPath:
+      #       path: /data # 這是 hostPath 的設定，代表在每個 node 上的 /data 目錄 (類似 docker bind mount)
+      #       type: DirectoryOrCreate # 如果目錄不存在，則自動建立
+
+      # ----- hostPath as Persistent Volume Claim(PVC) 範例 -----
       volumes:
         - name: story-volume
-          hostPath:
-            path: /data # 這是 hostPath 的設定，代表在每個 node 上的 /data 目錄 (類似 docker bind mount)
-            type: DirectoryOrCreate # 如果目錄不存在，則自動建立
+          persistentVolumeClaim:
+            claimName: host-pvc # 對應 host-pvc.yml 檔案中的 metadata.name
