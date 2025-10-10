@@ -14,4 +14,16 @@ spec:
     spec:
       containers:
         - name: story
-          image: indianapacer15/udemy-docker-n-kubernetes-course:course-212-k8s-data-demo-v1.0
+          image: indianapacer15/udemy-docker-n-kubernetes-course:course-212-k8s-data-demo-v1.1
+          # k8s 中 volume 的配置，不僅需要在後面宣告，還需要在 container 中 mount
+          volumeMounts:
+            # container 內的路徑，這邊參考了 dockerfile 中的 WORKDIR 以及 app.js 中讀取檔案的路徑
+            - mountPath: /app/story
+              name: story-volume # 對應下面 volumes 的 name
+      # 需要的 volumes 需要加在這邊，與 container 同層級
+      volumes:
+        - name: story-volume
+          emptyDir: {} # 空的設定內容代表使用預設值，不做任何客製化
+
+          # emptyDir 會在 Pod 啟動時建立一個空目錄，並在 Pod 被刪除時自動刪除該目錄
+          # 如果 restart 或 remove 的僅是 container 而非 Pod，則該目錄會保留
