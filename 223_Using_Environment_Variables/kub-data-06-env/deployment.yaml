@@ -17,11 +17,14 @@ spec:
           image: indianapacer15/udemy-docker-n-kubernetes-course:course-212-k8s-env-var-demo-v1.0
           env: # 這邊用 ConfigMap 來設定環境變數
             - name: STORY_FOLDER # key
-              value: 'story' # 基本的方法可以僅使用 value 直接指定
-              # valueFrom:
-              #   configMapKeyRef:
-              #     name: data-store-env
-              #     key: folder
+              # value: 'story' # 基本的方法可以僅使用 value 直接指定
+
+              # 進階的方式可以將多個環境變數集中管理在 ConfigMap 裡
+              # (類似 .env 檔，但更適合用在 k8s 環境，用一個 .yaml 檔來定義)
+              valueFrom:
+                configMapKeyRef:
+                  name: data-store-env
+                  key: folder # 指定要使用 data-store-env 裡的哪個 key
           volumeMounts:
             - mountPath: /app/story
               name: story-volume
