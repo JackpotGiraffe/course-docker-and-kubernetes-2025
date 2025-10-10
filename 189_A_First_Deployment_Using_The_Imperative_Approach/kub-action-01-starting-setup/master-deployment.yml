@@ -38,7 +38,13 @@ spec:
     spec:
       containers:
         - name: d-mode-app
-          image: indianapacer15/udemy-docker-n-kubernetes-course:course-189-k8s-imperative-1.02
+          image: indianapacer15/udemy-docker-n-kubernetes-course:course-189-k8s-imperative
+          imagePullPolicy: Always # Policy 如果用 Always，即使 image tag 沒變，k8s 也會每次都去拉最新的 image
+          # 可以使用的 imagePullPolicy 有三種
+          # Always: 每次都拉最新的 image，如果 tag 用的是 latest，就不需要使用這個 policy
+          # IfNotPresent: 如果本地有就不拉，沒有就拉最新的 image
+          # Never: 永遠不拉，使用本地的 image
+
           # 下方的宣告標籤，如字面意思，戳戳看是不是活著
           livenessProbe:
             httpGet:
