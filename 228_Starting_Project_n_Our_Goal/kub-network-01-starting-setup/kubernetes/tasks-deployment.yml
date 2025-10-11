@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: tasks
-          image: indianapacer15/udemy-docker-n-kubernetes-course:course-228-k8s-network-demo-tasks-v1.2
+          image: indianapacer15/udemy-docker-n-kubernetes-course:course-228-k8s-network-demo-tasks-v1.3
           env:
             - name: AUTH_ADDRESS
               value: "auth-service.default"
