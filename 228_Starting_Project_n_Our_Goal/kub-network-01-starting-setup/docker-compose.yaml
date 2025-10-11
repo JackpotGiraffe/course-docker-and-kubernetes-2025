@@ -6,6 +6,9 @@ services:
   users:
     image: users-api
     build: ./users-api
+    # 配合 users-app.js 裡面用的 domain name 改為使用 process.env.AUTH_ADDRESS 動態載入，以下變更設定
+    environment:
+      AUTH_ADDRESS: auth
     ports: 
       - "8080:8080"
   tasks:

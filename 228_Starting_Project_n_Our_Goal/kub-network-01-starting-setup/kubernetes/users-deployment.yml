@@ -14,4 +14,15 @@ spec:
     spec:
       containers:
         - name: users
-          image: indianapacer15/udemy-docker-n-kubernetes-course:course-228-k8s-network-demo-users-v1.0
+          image: indianapacer15/udemy-docker-n-kubernetes-course:course-228-k8s-network-demo-users-v1.1 # 因為 users.js 有改，所以 image 做 revision
+          env:
+            - name: AUTH_ADDRESS
+              value: localhost
+        # 為了創建一個 auth-api container 的 endpoint，讓 users service 可以連到 auth service
+        # 不另外創建一個 auth-api 的 k8s deployment，而將 auth-api container 整合在這邊
+        - name: auth
+          image: indianapacer15/udemy-docker-n-kubernetes-course:course-228-k8s-network-demo-auth-v1.0
+
+        
+      # 在 k8s 架構下，要能夠讓 users.js 中的 process.env.AUTH_ADDRESS 起到作用 (換言之要實作 Pod-internal communication)
+      # 就需要在 container 裡面設定 environment variable
