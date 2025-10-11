@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-service
+spec:
+  selector:
+    app: users
+  # ClusterIP (default), NodePort, LoadBalancer, ExternalName
+  # 為了讓這個 service 可以被外部存取，所以改成 LoadBalancer，因為預設的 ClusterIP 只能在 cluster 內部存取
+  type: LoadBalancer # LoadBalancer 是唯一既能夠被 cluster 外部存取，又能夠被 cluster 內部存取的 service type
+  ports:
+    - protocol: TCP
+      port: 8080 # 參考 user-api/users-app.js 裡面 app.listen(8080)，應用程式監聽的 port
+      targetPort: 8080 # 參考 user-api/Dockerfile 裡面的 EXPOSE 8080，container 對外開放的 port
