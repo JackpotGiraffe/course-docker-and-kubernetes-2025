@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+spec:
+  selector:
+    app: auth
+  # ClusterIP (default), NodePort, LoadBalancer, ExternalName
+  type: ClusterIP # 為了避免 auth service 被外部存取，所以維持預設的 ClusterIP
+  ports:
+    - protocol: TCP
+      port: 80 # 參考 auth-api/users-app.js 裡面 app.listen(80)，應用程式監聽的 port
+      targetPort: 80 # 參考 auth-api/Dockerfile 裡面的 EXPOSE 80，container 對外開放的 port

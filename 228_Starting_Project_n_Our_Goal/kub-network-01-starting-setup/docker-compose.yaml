@@ -9,6 +9,8 @@ services:
     # 配合 users-app.js 裡面用的 domain name 改為使用 process.env.AUTH_ADDRESS 動態載入，以下變更設定
     environment:
       AUTH_ADDRESS: auth
+      # 配合 k8s 的 service name 改為 AUTH_SERVICE_SERVICE_HOST
+      AUTH_SERVICE_SERVICE_HOST: auth
     ports: 
       - "8080:8080"
   tasks:
