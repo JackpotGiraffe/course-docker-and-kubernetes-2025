@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasks-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tasks
+  template:
+    metadata:
+      labels:
+        app: tasks
+    spec:
+      containers:
+        - name: tasks
+          image: indianapacer15/udemy-docker-n-kubernetes-course:course-228-k8s-network-demo-tasks-v1.2
+          env:
+            - name: AUTH_ADDRESS
+              value: "auth-service.default"
+            - name: TASKS_FOLDER
+              value: "tasks"

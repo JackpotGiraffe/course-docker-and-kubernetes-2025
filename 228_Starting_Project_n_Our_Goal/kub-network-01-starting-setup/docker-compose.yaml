@@ -20,4 +20,6 @@ services:
       - "8000:8000"
     environment:
       TASKS_FOLDER: tasks
+    # 配合 tasks-app.js 裡面用的 domain name 改為使用 process.env.AUTH_ADDRESS 動態載入，以下變更設定
+      AUTH_ADDRESS: auth
     
